@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client/core';
+import { gql } from '@apollo/client/core/core.cjs.js';
 
 export const ping = gql`
 	query {

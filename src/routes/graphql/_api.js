@@ -1,9 +1,13 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client/core';
+import { ApolloClient, InMemoryCache } from '@apollo/client/core/core.cjs.js';
+import { enviroment } from '$lib/enviroment';
+
+const uri = enviroment.graphQLURI || 'http://localhost:3001';
 
 const client = new ApolloClient({
-	uri: 'http://localhost:3001',
+	uri,
 	cache: new InMemoryCache()
 });
+console.log(`Connect GraphQL URI ${uri}`);
 
 export async function query(query, variables) {
 	try {
