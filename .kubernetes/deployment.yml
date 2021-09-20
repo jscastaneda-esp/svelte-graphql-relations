@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: svelte-graphql-relations
-        image: registry.digitalocean.com/graphql-relations/sveltekit-graphql-relations:0.0.1-beta
+        image: <IMAGE>
         env:
         - name: GRAPHQL_URI
           value: http://graphql-relations-service
