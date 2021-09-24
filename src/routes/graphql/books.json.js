@@ -1,4 +1,4 @@
-import { query } from './_api';
+import { gqQuery } from './_api';
 import { books } from './_querys';
 
-export const get = async () => query(books, {});
+export const get = async () => gqQuery(books, {});

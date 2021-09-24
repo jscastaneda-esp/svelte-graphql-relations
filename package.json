@@ -19,10 +19,12 @@
 		"graphql": "^15.5.3",
 		"prettier": "~2.2.1",
 		"prettier-plugin-svelte": "^2.2.0",
-		"svelte": "^3.34.0"
+		"svelte": "^3.34.0",
+		"svelte-forms": "^1.1.51"
 	},
 	"type": "module",
 	"dependencies": {
+		"@fortawesome/fontawesome-free": "^5.15.4",
 		"bulma": "^0.9.3"
 	}
 }

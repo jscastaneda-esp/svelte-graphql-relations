@@ -11,21 +11,15 @@
 			>
 			<a
 				sveltekit:prefetch
-				href="/books"
-				class="navbar-item"
-				class:is-active={$page.path === '/books'}>Books</a
-			>
-			<a
-				sveltekit:prefetch
 				href="/authors"
 				class="navbar-item"
 				class:is-active={$page.path === '/authors'}>Authors</a
 			>
 			<a
 				sveltekit:prefetch
-				href="/reviews"
+				href="/books"
 				class="navbar-item"
-				class:is-active={$page.path === '/reviews'}>Reviews</a
+				class:is-active={$page.path === '/books'}>Books</a
 			>
 		</div>
 	</div>
