@@ -26,15 +26,21 @@
 <script>
 	import { afterUpdate } from 'svelte';
 	import { form } from 'svelte-forms';
+	import CardList from '$lib/components/CardList.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import CardItem from '$lib/components/CardItem.svelte';
+	import ButtonLoading from '$lib/components/ButtonLoading.svelte';
+	import ButtonDelete from '$lib/components/ButtonDelete.svelte';
+	import ButtonEdit from '$lib/components/ButtonEdit.svelte';
+	import Button from '$lib/components/Button.svelte';
 
-	export let authors;
+	export let authors = [];
 
 	let showModal = false;
 	let loading = false;
-
 	let id;
 	let name;
+
 	const formData = form(
 		() => ({
 			name: {
@@ -125,10 +131,7 @@
 	};
 
 	const handleDelete = async (deleteId) => {
-		loading = true;
-		id = deleteId;
-
-		const res = await fetch(`/graphql/authors.json?id=${id}`, {
+		const res = await fetch(`/graphql/authors.json?id=${deleteId}`, {
 			method: 'DELETE'
 		});
 
@@ -144,22 +147,30 @@
 				console.error(errors);
 			}
 		}
-
-		id = undefined;
-		loading = false;
 	};
 </script>
 
-<div class="block">
-	<button class="button is-info" on:click={handleOpenModal}>
-		<span class="icon">
-			<i class="fas fa-plus-circle" />
-		</span>
-		<span>Nuevo Author</span>
-	</button>
+<div class="block mb-2">
+	<Button value="Nuevo Autor" isInfo on:click={handleOpenModal}>
+		<svg
+			slot="icon"
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-6 w-6"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+			/>
+		</svg>
+	</Button>
 </div>
 
-<Modal
+<!-- <Modal
 	show={showModal}
 	on:close={handleCloseModal}
 	on:submit={handleSave}
@@ -193,50 +204,42 @@
 			<p class="help is-danger">Nombre es requerido</p>
 		{/if}
 	</div>
-</Modal>
+</Modal> -->
 
-<div class="columns is-multiline">
-	{#each authors as author (author.id)}
-		<div class="column is-3">
-			<div class="card">
-				<header class="card-header">
-					<p class="card-header-title">{author.name}</p>
-					{#if id !== author.id}
-						<button class="card-header-icon" aria-label="Edit" on:click={() => handleEdit(author)}>
-							<span class="icon">
-								<i class="fas fa-pen-square" aria-hidden="true" />
-							</span>
-						</button>
-						<button
-							class="card-header-icon"
-							aria-label="Delete"
-							on:click={() => handleDelete(author.id)}
-						>
-							<span class="icon has-text-danger">
-								<i class="fas fa-trash" aria-hidden="true" />
-							</span>
-						</button>
+{#if !authors.length}
+	<p class="text-gray-700 p-3 text-lg text-center font-semibold">No hay autores</p>
+{:else}
+	<CardList>
+		{#each authors as author (author.id)}
+			<CardItem title={author.name}>
+				<div class="h-24">
+					{#if author.books.length}
+						<ul class="list-disc list-inside overflow-x-auto h-full">
+							{#each author.books as book}
+								<li>
+									{book.title}
+								</li>
+							{/each}
+						</ul>
 					{:else}
-						<button class="button is-loading" />
+						<p class="text-gray-700 p-3 text-lg text-center h-20 font-semibold">Sin libros</p>
 					{/if}
-				</header>
-				<div class="card-content">
-					<div class="content">
-						{#if author.books.length}
-							<h4>Libros:</h4>
-							<ul>
-								{#each author.books as book}
-									<li>
-										{book.title}
-									</li>
-								{/each}
-							</ul>
-						{:else}
-							<h4>Sin libros</h4>
-						{/if}
-					</div>
 				</div>
-			</div>
-		</div>
-	{/each}
-</div>
+				<svelte:fragment slot="buttons">
+					{#if !author.loading}
+						<ButtonEdit className="mr-2" on:click={handleEdit} />
+						<ButtonDelete
+							on:click={async () => {
+								author.loading = true;
+								await handleDelete(author.id);
+								author.loading = false;
+							}}
+						/>
+					{:else}
+						<ButtonLoading />
+					{/if}
+				</svelte:fragment>
+			</CardItem>
+		{/each}
+	</CardList>
+{/if}

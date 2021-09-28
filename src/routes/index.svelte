@@ -1,28 +1,41 @@
-<script context="module">
-	export const load = async ({ fetch }) => {
+<script>
+	import { onDestroy, onMount } from 'svelte';
+
+	let ping;
+
+	const pingTest = async () => {
 		const res = await fetch('/graphql/ping.json');
 		if (res.ok) {
 			const data = await res.json();
 
-			return {
-				props: { ping: data.ping }
-			};
+			ping = data.ping;
+		} else {
+			ping = 'error';
+		}
+	};
+
+	function sleep(ms) {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
+	const interval = setInterval(async () => {
+		console.log();
+		if (ping === 'error') {
+			await sleep(5000);
 		}
 
-		return {
-			error: String(res.status)
-		};
-	};
+		pingTest();
+	}, 5000);
+
+	onMount(pingTest);
+
+	onDestroy(() => clearInterval(interval));
 </script>
 
-<script>
-	export let ping;
-</script>
-
-<div class="box">
-	{#if ping === 'pong'}
-		<h1 class="title is-uppercase has-text-success">Conectado</h1>
-	{:else}
-		<h1 class="title is-uppercase has-text-danger">Desconectado</h1>
-	{/if}
+<div
+	class="mx-auto shadow-2xl p-4 text-center w-64 uppercase text-white font-bold text-lg rounded-lg"
+	class:bg-green-500={ping === 'pong'}
+	class:bg-red-500={ping !== 'pong'}
+>
+	{ping === 'pong' ? 'Conectado' : 'Desconectado'}
 </div>

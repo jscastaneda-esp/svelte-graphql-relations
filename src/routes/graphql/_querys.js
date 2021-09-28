@@ -6,18 +6,6 @@ export const ping = gql`
 	}
 `;
 
-export const books = gql`
-	query {
-		books {
-			id
-			title
-			author {
-				name
-			}
-		}
-	}
-`;
-
 export const authors = gql`
 	query {
 		authors {
@@ -57,6 +45,26 @@ export const updateAuthor = gql`
 export const deleteAuthor = gql`
 	mutation deleteAuthor($id: ID!) {
 		deleteAuthor(id: $id) {
+			id
+		}
+	}
+`;
+
+export const books = gql`
+	query {
+		books {
+			id
+			title
+			author {
+				name
+			}
+		}
+	}
+`;
+
+export const deleteBook = gql`
+	mutation deleteBook($id: ID!) {
+		deleteBook(id: $id) {
 			id
 		}
 	}

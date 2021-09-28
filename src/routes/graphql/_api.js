@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client/core';
+import { ApolloClient, InMemoryCache } from '@apollo/client/core/core.cjs.js';
 import { enviroment } from '$lib/utils/enviroment';
 
 const uri = enviroment.graphQLURI || 'http://localhost:3001';
