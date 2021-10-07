@@ -32,10 +32,12 @@
 	onDestroy(() => clearInterval(interval));
 </script>
 
-<div
-	class="mx-auto shadow-2xl p-4 text-center w-64 uppercase text-white font-bold text-lg rounded-lg"
-	class:bg-green-500={ping === 'pong'}
-	class:bg-red-500={ping !== 'pong'}
->
+<div class="ping-status" class:bg-green-500={ping === 'pong'} class:bg-red-500={ping !== 'pong'}>
 	{ping === 'pong' ? 'Conectado' : 'Desconectado'}
 </div>
+
+<style lang="postcss">
+	.ping-status {
+		@apply mx-auto shadow-2xl p-4 text-center w-64 uppercase text-white font-bold text-lg rounded-lg;
+	}
+</style>

@@ -4,9 +4,17 @@
 @tailwind utilities;
 
 .btn {
-	@apply shadow rounded p-2 font-semibold flex;
+	@apply shadow rounded p-2 font-semibold flex hover:bg-gray-200;
 }
 
 .btn.btn-info {
-	@apply text-white border-2 border-blue-500 bg-blue-500 hover:bg-blue-400;
+	@apply text-white border-2 border-blue-500 bg-blue-500 hover:bg-blue-600;
+}
+
+.icon-xl {
+	@apply h-6 w-6 text-xl leading-6;
+}
+
+.empty-data-message {
+	@apply text-gray-700 p-3 text-lg text-center font-semibold;
 }

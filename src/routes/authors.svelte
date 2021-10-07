@@ -32,7 +32,7 @@
 	import ButtonLoading from '$lib/components/ButtonLoading.svelte';
 	import ButtonDelete from '$lib/components/ButtonDelete.svelte';
 	import ButtonEdit from '$lib/components/ButtonEdit.svelte';
-	import Button from '$lib/components/Button.svelte';
+	import ButtonAdd from '$lib/components/ButtonAdd.svelte';
 
 	export let authors = [];
 
@@ -151,26 +151,10 @@
 </script>
 
 <div class="block mb-2">
-	<Button value="Nuevo Autor" isInfo on:click={handleOpenModal}>
-		<svg
-			slot="icon"
-			xmlns="http://www.w3.org/2000/svg"
-			class="h-6 w-6"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke="currentColor"
-		>
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-			/>
-		</svg>
-	</Button>
+	<ButtonAdd value="Nuevo Autor" on:click={handleOpenModal} />
 </div>
 
-<!-- <Modal
+<Modal
 	show={showModal}
 	on:close={handleCloseModal}
 	on:submit={handleSave}
@@ -204,17 +188,17 @@
 			<p class="help is-danger">Nombre es requerido</p>
 		{/if}
 	</div>
-</Modal> -->
+</Modal>
 
 {#if !authors.length}
-	<p class="text-gray-700 p-3 text-lg text-center font-semibold">No hay autores</p>
+	<p class="empty-data-message">No hay autores</p>
 {:else}
 	<CardList>
 		{#each authors as author (author.id)}
 			<CardItem title={author.name}>
 				<div class="h-24">
-					{#if author.books.length}
-						<ul class="list-disc list-inside overflow-x-auto h-full">
+					{#if !author.books.length}
+						<ul class="list-books">
 							{#each author.books as book}
 								<li>
 									{book.title}
@@ -222,7 +206,7 @@
 							{/each}
 						</ul>
 					{:else}
-						<p class="text-gray-700 p-3 text-lg text-center h-20 font-semibold">Sin libros</p>
+						<p class="empty-data-message h-20">Sin libros</p>
 					{/if}
 				</div>
 				<svelte:fragment slot="buttons">
@@ -243,3 +227,9 @@
 		{/each}
 	</CardList>
 {/if}
+
+<style lang="postcss">
+	.list-books {
+		@apply list-disc list-inside overflow-x-auto h-full;
+	}
+</style>
