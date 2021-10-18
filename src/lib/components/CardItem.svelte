@@ -1,8 +1,10 @@
 <script>
+	import { scale } from 'svelte/transition';
+
 	export let title = '';
 </script>
 
-<div class="card">
+<div class="card" in:scale>
 	<h2 class="title">{title}</h2>
 	<div class="body">
 		<slot />

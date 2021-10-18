@@ -1,4 +1,5 @@
 <script>
+	import PageLoader from '$lib/components/PageLoader.svelte';
 	import '@fortawesome/fontawesome-free/css/all.css';
 	import '../app.postcss';
 
@@ -6,8 +7,18 @@
 	import graphqlLogo from '$lib/assets/graphql-logo.png';
 	import svelteLogo from '$lib/assets/svelte-logo.png';
 
+	let navigationState = null;
 	let menuClosed = true;
 </script>
+
+<svelte:window
+	on:sveltekit:navigation-start={() => (navigationState = 'loading')}
+	on:sveltekit:navigation-end={() => (navigationState = 'loaded')}
+/>
+
+{#if navigationState == 'loading'}
+	<PageLoader />
+{/if}
 
 <nav class="bg-gray-800">
 	<div class="navbar">

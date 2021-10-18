@@ -1,18 +1,12 @@
 <script>
 	import { onMount, createEventDispatcher } from 'svelte';
 
-	import Button from "$lib/components/Button.svelte";
+	import Button from '$lib/components/Button.svelte';
+	import ButtonLoading from '$lib/components/ButtonLoading.svelte';
 
-	export let show = false;
 	export let saveDisable = false;
 	export let loading = false;
 	const dispatch = createEventDispatcher();
-
-	let rootEl;
-
-	onMount(() => {
-		rootEl = document.documentElement;
-	});
 
 	const handleClose = () => {
 		if (!loading) {
@@ -24,121 +18,68 @@
 			dispatch('submit');
 		}
 	};
-
-	$: if (rootEl) {
-		if (show) {
-			rootEl.classList.add('is-clipped');
-		} else {
-			rootEl.classList.remove('is-clipped');
-		}
-	}
 </script>
 
-<!-- This example requires Tailwind CSS v2.0+ -->
-<div
-	class="fixed z-10 inset-0 overflow-y-auto"
-	class:hidden={!show}
-	aria-labelledby="modal-title"
-	role="dialog"
-	aria-modal="true"
->
-	<div
-		class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
-	>
-		<div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" />
-		<span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"
-			>&#8203;</span
-		>
-		<div
-			class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-		>
-			<div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-				<div class="sm:flex sm:items-start">
-					<div
-						class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-					>
-						<!-- Heroicon name: outline/exclamation -->
-						<svg
-							class="h-6 w-6 text-red-600"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-							/>
-						</svg>
-					</div>
-					<div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-						<h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-							Deactivate account
-						</h3>
-						<div class="mt-2">
-							<p class="text-sm text-gray-500">
-								Are you sure you want to deactivate your account? All of your data will be
-								permanently removed. This action cannot be undone.
-							</p>
-						</div>
-					</div>
-				</div>
+<div class="modal" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+	<div class="background" aria-hidden="true" on:click={handleClose} />
+
+	<div class="content">
+		<div class="close p-px-6" class:hidden={loading} on:click|preventDefault={handleClose}>
+			<i class="icon-xl fas fa-times" />
+		</div>
+		<form on:submit|preventDefault={handleSubmit}>
+			<div class="body">
+				<slot />
 			</div>
-			<div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:justify-end">
+			<div class="buttons">
 				{#if !loading}
-					<Button className="ml-2 font-normal!important" value="Cancelar" on:click={handleClose}>
+					<Button
+						type="submit"
+						className="w-full sm:w-auto"
+						value="Guardar"
+						isInfo
+						disabled={saveDisable}
+					>
+						<i class="icon-xl fas fa-save" slot="icon" />
+					</Button>
+					<Button
+						className="mb-2 w-full sm:mb-0 sm:mr-2 sm:w-auto"
+						value="Cancelar"
+						on:click={handleClose}
+					>
 						<i class="icon-xl fas fa-ban" slot="icon" />
 					</Button>
-					<!-- <button
-						type="button"
-						class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-						on:click|preventDefault={handleClose}
-					>
-						<span>Cancelar</span>
-					</button> -->
+				{:else}
+					<ButtonLoading className="w-full sm:w-auto" />
 				{/if}
-				<button
-					type="button"
-					class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-				>
-					Deactivate
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!-- <div class="modal" class:is-active={show}>
-	<div class="modal-background" on:click={handleClose} />
-	<div class="modal-content box">
-		<form on:submit|preventDefault={handleSubmit}>
-			<slot />
-			<div class="field has-addons is-justify-content-end">
-				{#if !loading}
-					<p class="control">
-						<button class="button is-light" type="button" on:click|preventDefault={handleClose}>
-							<span class="icon">
-								<i class="fas fa-ban" />
-							</span>
-							<span>Cancelar</span>
-						</button>
-					</p>
-				{/if}
-				<p class="control">
-					<button class="button is-info" class:is-loading={loading} disabled={saveDisable}>
-						<span class="icon">
-							<i class="fas fa-save" />
-						</span>
-						<span>Guardar</span>
-					</button>
-				</p>
 			</div>
 		</form>
 	</div>
-	<button class="modal-close is-large" aria-label="close" on:click|preventDefault={handleClose} />
-</div> -->
-<style>
+</div>
+
+<style lang="postcss">
+	.modal {
+		@apply fixed flex z-10 inset-0 justify-center items-center min-h-screen pt-4 px-4 pb-20 overflow-y-auto sm:p-0;
+	}
+
+	.modal .background {
+		@apply fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity;
+	}
+
+	.modal .content {
+		height: max-content;
+		@apply w-auto inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full;
+	}
+
+	.content .close {
+		@apply absolute rounded-full leading-none cursor-pointer bg-red-600 text-center -right-2 -top-2;
+	}
+
+	.content .body {
+		@apply p-4 sm:p-6;
+	}
+
+	.content .buttons {
+		@apply px-4 py-3 flex flex-col-reverse sm:flex-row-reverse sm:px-6 sm:justify-start;
+	}
 </style>

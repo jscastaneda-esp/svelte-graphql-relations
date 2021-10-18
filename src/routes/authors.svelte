@@ -3,6 +3,10 @@
 		const res = await fetch('/graphql/authors.json');
 		if (res.ok) {
 			const data = await res.json();
+			data.authors = data.authors.map((author) => {
+				author.title = author.name;
+				return author;
+			});
 
 			return {
 				props: {
@@ -26,9 +30,9 @@
 <script>
 	import { afterUpdate } from 'svelte';
 	import { form } from 'svelte-forms';
+
 	import CardList from '$lib/components/CardList.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import CardItem from '$lib/components/CardItem.svelte';
 	import ButtonLoading from '$lib/components/ButtonLoading.svelte';
 	import ButtonDelete from '$lib/components/ButtonDelete.svelte';
 	import ButtonEdit from '$lib/components/ButtonEdit.svelte';
@@ -84,6 +88,7 @@
 
 			if (res.ok) {
 				const data = await res.json();
+				data.createAuthor.title = data.createAuthor.name;
 
 				authors = [...authors, data.createAuthor];
 				handleCloseModal();
@@ -108,6 +113,7 @@
 
 			if (res.ok) {
 				const data = await res.json();
+				data.updateAuthor.title = data.updateAuthor.name;
 
 				authors = authors.map((author) => (author.id === id ? data.updateAuthor : author));
 				handleCloseModal();
@@ -125,9 +131,9 @@
 	};
 
 	const handleEdit = (editAuthor) => {
-		handleOpenModal();
 		id = editAuthor.id;
 		name = editAuthor.name;
+		handleOpenModal();
 	};
 
 	const handleDelete = async (deleteId) => {
@@ -154,78 +160,64 @@
 	<ButtonAdd value="Nuevo Autor" on:click={handleOpenModal} />
 </div>
 
-<Modal
-	show={showModal}
-	on:close={handleCloseModal}
-	on:submit={handleSave}
-	saveDisable={!$formData?.valid}
-	{loading}
->
-	<div class="field">
-		<label for="name" class="label">Nombre</label>
-		<p class="control has-icons-left has-icons-right">
-			<input
-				id="name"
-				class="input"
-				class:is-danger={$formData?.fields.name.dirty && !$formData?.fields.name.valid}
-				type="text"
-				placeholder="Nombre"
-				bind:value={name}
-			/>
-			<span
-				class="icon is-left"
-				class:has-text-danger={$formData?.fields.name.dirty && !$formData?.fields.name.valid}
-			>
-				<i class="fas fa-user" />
-			</span>
-			{#if $formData?.fields.name.dirty && !$formData?.fields.name.valid}
-				<span class="icon is-right has-text-danger">
-					<i class="fas fa-exclamation-triangle" />
-				</span>
-			{/if}
-		</p>
-		{#if $formData?.fields.name.dirty && !$formData?.fields.name.valid}
-			<p class="help is-danger">Nombre es requerido</p>
+<CardList items={authors} emptyDataMessage="No hay autores" let:item>
+	<div class="h-24">
+		{#if item.books.length}
+			<ul class="list-books">
+				{#each item.books as book}
+					<li>
+						{book.title}
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<a href={`/books?new=${item.id}`} class="btn info w-1/2 m-auto">Crear nuevo libro</a>
 		{/if}
 	</div>
-</Modal>
+	<svelte:fragment slot="buttons">
+		{#if !item.loading}
+			<ButtonEdit className="mr-2" on:click={() => handleEdit(item)} />
+			<ButtonDelete
+				on:click={async () => {
+					item.loading = true;
+					await handleDelete(item.id);
+					item.loading = false;
+				}}
+			/>
+		{:else}
+			<ButtonLoading />
+		{/if}
+	</svelte:fragment>
+</CardList>
 
-{#if !authors.length}
-	<p class="empty-data-message">No hay autores</p>
-{:else}
-	<CardList>
-		{#each authors as author (author.id)}
-			<CardItem title={author.name}>
-				<div class="h-24">
-					{#if !author.books.length}
-						<ul class="list-books">
-							{#each author.books as book}
-								<li>
-									{book.title}
-								</li>
-							{/each}
-						</ul>
-					{:else}
-						<p class="empty-data-message h-20">Sin libros</p>
-					{/if}
-				</div>
-				<svelte:fragment slot="buttons">
-					{#if !author.loading}
-						<ButtonEdit className="mr-2" on:click={handleEdit} />
-						<ButtonDelete
-							on:click={async () => {
-								author.loading = true;
-								await handleDelete(author.id);
-								author.loading = false;
-							}}
-						/>
-					{:else}
-						<ButtonLoading />
-					{/if}
-				</svelte:fragment>
-			</CardItem>
-		{/each}
-	</CardList>
+{#if showModal}
+	<Modal
+		on:close={handleCloseModal}
+		on:submit={handleSave}
+		saveDisable={!$formData?.valid}
+		{loading}
+	>
+		<div>
+			<label for="name" class="hidden">Nombre</label>
+			<div
+				class="group-field"
+				class:invalid={$formData?.fields.name.dirty && !$formData?.fields.name.valid}
+			>
+				<input id="name" class="field" type="text" placeholder="Nombre" bind:value={name} />
+				<span class="icon left-0">
+					<i class="fas fa-user" />
+				</span>
+				{#if $formData?.fields.name.dirty && !$formData?.fields.name.valid}
+					<span class="icon right-0">
+						<i class="fas fa-exclamation-triangle" />
+					</span>
+				{/if}
+			</div>
+			{#if $formData?.fields.name.dirty && !$formData?.fields.name.valid}
+				<p class="alert-error">Nombre es requerido</p>
+			{/if}
+		</div>
+	</Modal>
 {/if}
 
 <style lang="postcss">
